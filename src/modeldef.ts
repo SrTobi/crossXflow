@@ -47,11 +47,11 @@ export namespace Model {
     }
 
     export interface IEmpty extends ITileBase {
-        tpye: TileType.Empty
+        type: TileType.Empty
     }
 
     export interface ICrossing extends ITileBase {
-        tpye: TileType.Crossing
+        type: TileType.Crossing
     }
 
 

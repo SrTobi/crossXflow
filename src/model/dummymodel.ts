@@ -15,7 +15,7 @@ class DummyModel implements Model.IWorld {
                 x: 0,
                 y: 0
             },
-            tpye: Model.TileType.Crossing
+            type: Model.TileType.Crossing
         }
     ]]
 }
