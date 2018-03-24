@@ -5,6 +5,9 @@ export namespace Model {
     export const TileWidth = 30
     export const TileHeight = 30
 
+    export const CarWidth = 1.8
+    export const CarLength = 4.5
+
     export interface ICar {
         // in world coordinates
         pos: {
