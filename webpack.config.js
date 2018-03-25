@@ -6,6 +6,7 @@ var SplitByPathPlugin = require('webpack-split-by-path');
 var r = file => path.resolve(__dirname, file[0]);
 
 var config = {
+  context: r("src"),
   entry: r`src/index.tsx`,
   output: {
     path: r`dist`,
