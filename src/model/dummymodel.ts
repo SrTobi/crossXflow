@@ -4,7 +4,10 @@ import { Model } from "../modeldef";
 
 
 class DummyModel implements Model.IWorld {
-    receiveCars(): Model.ICar[] {
+    update() {
+    }
+
+    get cars(): Model.ICar[] {
         return []
     }
 
