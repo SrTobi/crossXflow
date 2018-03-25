@@ -9,9 +9,14 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "runtimeExecutable": "/usr/bin/chromium",
-            "url": "http://localhost:8080",
+            "runtimeArgs": [
+                "--remote-debugging-port=9222",
+                "--user-data-dir"
+            ],
+            "url": "http://localhost:8080/",
             "webRoot": "${workspaceFolder}/src",
-            "sourceMaps": true
+            "sourceMaps": true,
+            "sourceMapPathOverrides": { "webpack:///*": "${webRoot}/*" }
         }
     ]
 }
