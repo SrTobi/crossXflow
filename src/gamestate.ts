@@ -3,7 +3,6 @@ import { State } from "./gameview";
 import { Resources } from "./resources";
 import { World, WorldGenerator } from "./world";
 import { Entity } from "./entity";
-import { Creature } from "./creature";
 import { Key, Keys } from "./keyboard";
 import { DummyModel } from "./model/dummymodel";
 import { Tile } from "./tiledef";
