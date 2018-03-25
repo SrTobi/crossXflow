@@ -9,7 +9,7 @@ export interface Resources {
   tiles: {
     crossing: PIXI.Texture;
     street: { [key: string]: PIXI.Texture };
-    car: { [key: string]: PIXI.Texture };
+    car: PIXI.Texture[];
   };
 }
 
@@ -37,9 +37,7 @@ export class ResourceLoaderState extends LoadState {
           nw: tex("street-nw.png"),
           sw: tex("street-sw.png")
         },
-        car: {
-          red: tex("car-red.png")
-        }
+        car: [1, 2, 3].map(idx => tex(`car-${idx}.png`))
       }
     };
     return new GameState(resources);

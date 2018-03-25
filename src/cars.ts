@@ -34,7 +34,8 @@ export class Cars extends Entity {
   }
 
   private generateCarSprite() {
-    const sprite = new PIXI.Sprite(this.res.tiles.car["red"]);
+    const carTileIdx = Math.floor(Math.random() * this.res.tiles.car.length);
+    const sprite = new PIXI.Sprite(this.res.tiles.car[carTileIdx]);
     sprite.scale.x = 1 / sprite.width;
     sprite.scale.y = 1 / sprite.height;
     return sprite;
