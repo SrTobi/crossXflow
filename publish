@@ -1,0 +1,10 @@
+#!/bin/sh
+rm -r node_modules dist
+git rm -r docs
+npm install
+npm run bundle
+mkdir docs
+cp -r dist/* docs
+git add docs
+git commit -m "publish new version"
+git push -f
