@@ -123,16 +123,8 @@ namespace EdgeShapes {
     };
 }
 
-class Reserved {
-    constructor(
-        public edge: Edge,
-        public startStep: number,
-        public steps: number
-    ) {}
-    
-    get endStep(): number {
-        return this.startStep + this.steps;
-    }
+class Lock {
+    holder: null | Car = null
 }
 
 interface EdgeShape {
@@ -146,15 +138,12 @@ class Edge {
     
     public done = false;
     public curRound = 0;
-    public reserved: Reserved[] = [];
-    public sameCollision: Edge[] = [];
-    public antiCollision: Edge[] = [];
     
     constructor(
         public from: Node,
         public to: Node,
         public shape: EdgeShape,
-        public resevreNexts = 0
+        public locks: Lock[]
     ) {
         this.length = this.to.pos.minus(this.from.pos).length * this.shape.length;
     }
@@ -179,7 +168,7 @@ class Edge {
     checkRound(round: number): boolean {
         if (round != this.curRound) {
             this.curRound = round;
-            this.reserved = [];
+            //this.reserved = [];
             return true;
         } else {
             return false;
@@ -215,23 +204,14 @@ class Tile {
     }
 }
 
-function makeSameCollision(e1: Edge, e2: Edge) {
-    e1.sameCollision.push(e2);
-    e2.sameCollision.push(e1);
-}
-
-function makeAntiCollision(e1: Edge, e2: Edge) {
-    e1.antiCollision.push(e2);
-    e2.antiCollision.push(e1);
-}
 
 function connect(
     from: Node,
     to: Node,
     shape: EdgeShape = EdgeShapes.Straight,
-    reserveNexts?: number
+    lock?: Lock[]
 ) {
-    const e = new Edge(from, to, shape, reserveNexts);
+    const e = new Edge(from, to, shape, lock || []);
     from.outs.push(e);
     to.ins.push(e);
     return e;
@@ -311,13 +291,28 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
         const topOut = new Node(
             new Vector(Model.TrackMax, Model.TileHeight / 2 + 2 * Model.LaneWidth)
         );
+
+        const leftMid = new Node(
+            new Vector(Model.TrackMin, Model.TileHeight / 2)
+        );
+        const rightMid = new Node(
+            new Vector(Model.TrackMax, Model.TileHeight / 2)
+        );
+
+
+        const nwLock = new Lock
+        const neLock = new Lock
+        const swLock = new Lock
+        const seLock = new Lock
         
-        const vnw = connect(topMin, topIn, EdgeShapes.Straight, 3);
-        const vtb = connect(topIn, bottomOut);
-        const vsw = connect(bottomOut, bottomMin);
-        const vse = connect(bottomMax, bottomIn, EdgeShapes.Straight, 3);
-        const vbt = connect(bottomIn, topOut);
-        const vne = connect(topOut, topMax);
+        connect(topMin, topIn);
+        connect(topIn, leftMid, undefined, [nwLock, swLock]);
+        connect(leftMid, bottomOut, undefined, [nwLock, swLock])
+        connect(bottomOut, bottomMin);
+        connect(bottomMax, bottomIn);
+        connect(bottomIn, rightMid, undefined, [neLock, seLock]);
+        connect(rightMid, topOut, undefined, [neLock, seLock]);
+        connect(topOut, topMax);
         
         const rightMin = new Node(new Vector(Model.TileWidth, Model.TrackMin));
         const rightMax = new Node(new Vector(Model.TileWidth, Model.TrackMax));
@@ -336,31 +331,35 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
         const leftOut = new Node(
             new Vector(Model.TileWidth / 2 - 2 * Model.LaneWidth, Model.TrackMax)
         );
+        const topMid = new Node(
+            new Vector(Model.TileWidth / 2, Model.TrackMax)
+        );
+        const bottomMid = new Node(
+            new Vector(Model.TileWidth / 2, Model.TrackMin)
+        );
         
-        const hne = connect(rightMax, rightIn, EdgeShapes.Straight, 3);
-        const hrl = connect(rightIn, leftOut);
-        const hnw = connect(leftOut, leftMax);
-        const hsw = connect(leftMin, leftIn, EdgeShapes.Straight, 3);
-        const hlr = connect(leftIn, rightOut);
-        const hse = connect(rightOut, rightMin);
+        connect(rightMax, rightIn);
+        connect(rightIn, topMid, undefined, [nwLock, neLock]);
+        connect(topMid, leftOut, undefined, [nwLock, neLock]);
+        connect(leftOut, leftMax);
+        connect(leftMin, leftIn);
+        connect(leftIn, bottomMid, undefined, [swLock, seLock]),
+        connect(bottomMid, rightOut, undefined, [swLock, seLock]);
+        connect(rightOut, rightMin);
         
         // Turn rights
         // TODO
-        const rbr = connect(bottomIn, rightOut, EdgeShapes.RightTurn);
-        const rrt = connect(rightIn, topOut, EdgeShapes.RightTurn);
-        const rtl = connect(topIn, leftOut, EdgeShapes.RightTurn);
-        const rlb = connect(leftIn, bottomOut, EdgeShapes.RightTurn);
+        connect(bottomIn, rightOut, EdgeShapes.RightTurn, [seLock]);
+        connect(rightIn, topOut, EdgeShapes.RightTurn, [neLock]);
+        connect(topIn, leftOut, EdgeShapes.RightTurn, [nwLock]);
+        connect(leftIn, bottomOut, EdgeShapes.RightTurn, [swLock]);
         
-        makeAntiCollision(vnw, hnw);
-        makeAntiCollision(vne, hne);
-        makeAntiCollision(vsw, hsw);
-        makeAntiCollision(vse, vse);
         
         return new Tile(
             pos,
             [bottomMax, leftMin, topMin, rightMax],
             [topMax, rightMin, bottomMin, leftMax],
-            [topIn, bottomIn, leftIn, rightIn, topOut, bottomOut, leftOut, rightOut]
+            [topIn, bottomIn, leftIn, rightIn, topOut, bottomOut, leftOut, rightOut, topMid, bottomMid, rightMid, leftMid]
         );
     } else {
         return new Tile(pos, [null, null, null, null], [null, null, null, null]);
@@ -511,7 +510,7 @@ export class BackendWorld implements Model.IWorld {
                     canCreate = true;
                 }
             }
-            if (canCreate && Math.random() < 0.07) {
+            if (canCreate && Math.random() < 0.01) {
                 // new car
                 const c = new Car(e, 0, 0, 0);
                 e.cars.push(c);
@@ -526,6 +525,7 @@ export class BackendWorld implements Model.IWorld {
         let kill = false;
         for (const car of this.autos) {
             car.speed += car.acceleration / Model.StepsPerSecond;
+            car.speed = Math.max(car.speed, 0)
             let meters = car.speed / Model.StepsPerSecond;
             while (meters > 0) {
                 const alphaDiff = meters / car.edge.length;
@@ -540,6 +540,12 @@ export class BackendWorld implements Model.IWorld {
                     }
                     car.edge.cars.splice(index, 1);
                     const outs = car.edge.to.outs;
+                    
+                    if ((outs.length == 0 || outs[car.roadToTake(0, outs.length)].locks.every(lock => lock.holder != car))
+                        && car.edge.locks.find(lock => lock.holder == car)) {
+                        car.edge.locks.filter(lock => lock.holder == car).forEach(lock => lock.holder = null)
+                    }
+
                     if (outs.length == 0) {
                         meters = 0;
                         car.alive = false;
@@ -582,21 +588,26 @@ export class BackendWorld implements Model.IWorld {
                         
                         if (nextCar) {
                             const alphaDiff = sameEdge
-                            ? car.alpha - nextCar.alpha
-                            : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha;
-                            car.acceleration =
-                            1 /
-                            Model.StepsPerSecond *
-                            (-700 * alphaDiff - 100 * (car.speed - nextCar.speed));
+                                ? car.alpha - nextCar.alpha
+                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha;
+                            car.acceleration = 1 / Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed - nextCar.speed));
                         }
                     }
                     
-                    if (
-                        car.speed + car.acceleration / Model.StepsPerSecond >
-                        Model.MaxSpeed
-                    ) {
+                    if (car.speed + car.acceleration / Model.StepsPerSecond > Model.MaxSpeed) {
                         car.acceleration = 0;
                         car.speed = Model.MaxSpeed;
+                    }
+
+                    if (edge.locks.find(lock => lock.holder != car && lock.holder != null)) {
+                        car.acceleration = -Model.MaxAcceleration
+                    }
+
+                    if (nextEdge) {
+                        const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car)
+                        if (canLock) {
+                            nextEdge.locks.forEach((value) => value.holder = car)
+                        }
                     }
                 });
             }
