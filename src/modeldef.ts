@@ -14,6 +14,8 @@ export namespace Model {
   export const CarWidth = 1.8;
   export const CarLength = 4.5;
 
+  export const LaneWidth = 3;
+
   export interface ICar {
     // in world coordinates
     pos: {

@@ -54,7 +54,7 @@ export class Cars extends Entity {
     // move the sprite to the center of the screen
     carSprite.x = car.pos.x / Model.TileWidth;
     carSprite.y = car.pos.y / Model.TileHeight;
-    carSprite.rotation = car.angle;
+    carSprite.rotation = Math.PI + car.angle;
   }
   private removeCar(carId: number) {
     const sprite = this.graphics.get(carId);
