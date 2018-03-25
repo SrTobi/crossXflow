@@ -9,6 +9,7 @@ import { DummyModel } from "./model/dummymodel";
 import { Tile } from "./tiledef";
 import { Model } from "./modeldef";
 import { Cars } from "./cars";
+import { BackendWorld } from './model/realmodel'
 
 const ScreenDimensionX = 100;
 const ScreenDimensionY = 100;
@@ -44,7 +45,7 @@ class Controls {
 }
 
 export class GameState extends State {
-  private model = new DummyModel();
+  private model = new BackendWorld();
 
   private worldGenerator: WorldGenerator;
   private world: World;

@@ -202,7 +202,7 @@ function cross(): Model.ITile {
     }
 }
 
-export class World implements Model.IWorld {
+export class BackendWorld implements Model.IWorld {
     
     tiles: Model.ITile[][] = [
         [empty(), horizontal(), empty()],
