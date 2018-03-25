@@ -238,17 +238,17 @@ export class BackendWorld implements Model.IWorld {
             }
         }
 
-        const dirs = [new Vector(0, -1), new Vector(-1, 0)]
+        const dirs = [new Vector(0, -1), new Vector(-1, 0), new Vector(0, 1), new Vector(1, 0)]
 
         // merge nodes
         for (let x = 0; x < this.pieces.length; ++x) {
             for (let y = 0; y < this.pieces[0].length; ++y) {
                 const pos = new Vector(x, y)
-                for (const diri of [0, 1]) {
+                for (const diri of [0, 1, 2, 3]) {
                     const dir = dirs[diri]
                     const to = pos.add(dir)
                     const t1 = this.pieces[x][y]
-                    if (to.x >= 0 && to.y >= 0) {
+                    if (to.x >= 0 && to.y >= 0 && to.x < this.pieces.length && to.y < this.pieces[0].length) {
                         const t2 = this.pieces[to.x][to.y]
                         const n1 = t1.inNodes[diri]
                         const n2 = t2.outNodes[diri]
@@ -270,6 +270,20 @@ export class BackendWorld implements Model.IWorld {
 
                         if (to.x < 0) {
                             const n = t1.inNodes[1]
+                            if (n) {
+                                this.genNodes.push(n)
+                            }
+                        }
+                        
+                        if (to.y >= this.pieces[0].length) {
+                            const n = t1.inNodes[2]
+                            if (n) {
+                                this.genNodes.push(n)
+                            }
+                        }
+
+                        if (to.x >= this.pieces.length) {
+                            const n = t1.inNodes[3]
                             if (n) {
                                 this.genNodes.push(n)
                             }
