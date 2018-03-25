@@ -27,8 +27,8 @@ class Vector {
 var nextId = 1
 
 class Car {
-    private randomList: number[]
-    private curRand: number
+    private randomList: number[] = []
+    private curRand: number = 0
     readonly id = nextId++
 
     public alive: boolean = true
@@ -38,7 +38,7 @@ class Car {
     }
 
     public roadToTake(futureIdx: number, possibleRoads: number): number {
-        return Math.floor(this.randomList[this.curRand % 10] * possibleRoads)
+        return Math.floor(this.randomList[(this.curRand + futureIdx) % 10] * possibleRoads)
     }
 
     public gotoNextRoad(possibleRoads: number): number {
@@ -55,7 +55,7 @@ class Car {
         public acceleration: number = 0
     ) {
         for (let i = 0; i < 10; ++i) {
-            this.randomList.push(i)
+            this.randomList.push(Math.random())
         }
     }
 
@@ -65,7 +65,7 @@ class Node {
     outs: Edge[] = []
     ins: Edge[] = []
 
-    constructor(public readonly pos: Vector) {
+    constructor(public pos: Vector) {
 
     }
 }
@@ -86,11 +86,25 @@ class Edge {
 
 class Tile {
     constructor(
-        public pos: Vector,
+        public coords: Vector,
         public inNodes: (Node | null)[],
         public outNodes: (Node | null)[]
     ) {
-        
+        for (const n of this.inNodes) {
+            if (n) {
+                n.pos = n.pos.add(this.pos)
+            }
+        }
+
+        for (const n of this.outNodes) {
+            if (n) {
+                n.pos = n.pos.add(this.pos)
+            }
+        }
+    }
+
+    get pos(): Vector {
+        return this.coords.mul(Model.TileWidth)
     }
 }
 
@@ -132,7 +146,7 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
             connect(topMin, bottomMin, Model.TileHeight)
             connect(bottomMax, topMax, Model.TileHeight)
 
-            return new Tile(pos, [null, topMin, null, bottomMax], [null, bottomMin, null, topMax])
+            return new Tile(pos, [bottomMax, null, topMin, null], [topMax, null, bottomMin, null])
 
         } else if (o === Model.TileOrientation.WestEast) {
             const rightMin = new Node(new Vector(Model.TileWidth, Model.TrackMin))
@@ -143,7 +157,7 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
             connect(rightMax, leftMax, Model.TileWidth)
             connect(leftMin, rightMin, Model.TileWidth)
 
-            return new Tile(pos, [leftMin, null, rightMax, null], [rightMin, null, leftMax, null])
+            return new Tile(pos, [null, leftMin, null, rightMax], [null, rightMin, null, leftMax])
 
         } else {
             throw new Error("not implemented")
@@ -167,7 +181,7 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
         connect(rightMax, leftMax, Model.TileWidth)
         connect(leftMin, rightMin, Model.TileWidth)
 
-        return new Tile(pos, [leftMin, topMin, rightMax, bottomMax], [rightMin, bottomMin, leftMax, topMax])
+        return new Tile(pos, [bottomMax, leftMin, topMin, rightMax], [topMax, rightMin, bottomMin, leftMax])
     } else {
         return new Tile(pos, [null, null, null, null], [null, null, null, null])
     }
@@ -205,12 +219,12 @@ function cross(): Model.ITile {
 export class BackendWorld implements Model.IWorld {
     
     tiles: Model.ITile[][] = [
-        [empty(), horizontal(), empty()],
-        [vertical(), cross(), vertical()],
-        [empty(), horizontal(), empty()]
+        [empty(), vertical(), empty()],
+        [horizontal(), cross(), horizontal()],
+        [empty(), vertical(), empty()]
     ]
 
-    private genNodes: Node[]
+    private genNodes: Node[] = []
 
     private pieces: Tile[][] = []
     private autos: Car[] = []
@@ -224,7 +238,7 @@ export class BackendWorld implements Model.IWorld {
             }
         }
 
-        const dirs = [new Vector(-1, 0), new Vector(0, -1)]
+        const dirs = [new Vector(0, -1), new Vector(-1, 0)]
 
         // merge nodes
         for (let x = 0; x < this.pieces.length; ++x) {
@@ -247,14 +261,14 @@ export class BackendWorld implements Model.IWorld {
                             t2.outNodes[diri] = n
                         }
                     } else {
-                        if (to.x < 0) {
+                        if (to.y < 0) {
                             const n = t1.inNodes[0]
                             if (n) {
                                 this.genNodes.push(n)
                             }
                         }
 
-                        if (to.y < 0) {
+                        if (to.x < 0) {
                             const n = t1.inNodes[1]
                             if (n) {
                                 this.genNodes.push(n)
@@ -272,13 +286,18 @@ export class BackendWorld implements Model.IWorld {
         for (const n of this.genNodes) {
             const e = n.outs[0]
             const car = e.cars[e.cars.length - 1]
+            let canCreate = true
             if (car) {
+                canCreate = false
                 if (car.alpha * e.length > Model.CarLength) {
-                    if (Math.random() < 0.01) {
-                        // new car
-                        e.cars.push(new Car(e, 0, 10, 0))
-                    }
+                    canCreate = true
                 }
+            }
+            if (canCreate && Math.random() < 0.1) {
+                // new car
+                const c = new Car(e, 0, 10, 0)
+                e.cars.push(c)
+                this.autos.push(c)
             }
         }
 
@@ -308,6 +327,8 @@ export class BackendWorld implements Model.IWorld {
                         car.edge = outs[car.gotoNextRoad(outs.length)]
                         car.edge.cars.push(car)
                     }
+                } else {
+                    meters = 0
                 }
             }
         }

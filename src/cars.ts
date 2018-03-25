@@ -36,8 +36,8 @@ export class Cars extends Entity {
   private generateCarSprite() {
     const carTileIdx = Math.floor(Math.random() * this.res.tiles.car.length);
     const sprite = new PIXI.Sprite(this.res.tiles.car[carTileIdx]);
-    sprite.scale.x = 1 / sprite.width;
-    sprite.scale.y = 1 / sprite.height;
+    sprite.scale.x = 1 / this.res.tiles.crossing.width;
+    sprite.scale.y = 1 / this.res.tiles.crossing.height;
     return sprite;
   }
 
@@ -52,8 +52,8 @@ export class Cars extends Entity {
   }
   private updateCarSprite(carSprite: PIXI.Sprite, car: Model.ICar) {
     // move the sprite to the center of the screen
-    carSprite.x = car.pos.x;
-    carSprite.y = car.pos.y;
+    carSprite.x = car.pos.x / Model.TileWidth;
+    carSprite.y = car.pos.y / Model.TileHeight;
     carSprite.rotation = car.angle;
   }
   private removeCar(carId: number) {

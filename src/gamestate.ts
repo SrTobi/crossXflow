@@ -70,6 +70,7 @@ export class GameState extends State {
     this.world = this.worldGenerator.buildWorld(this.model.tiles);
 
     this.view.addChild(this.world);
+    this.view.addChild(this.cars)
     this.stage.addChild(this.view);
 
     this.player = this.addEntity(new Creature());
