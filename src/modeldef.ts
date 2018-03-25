@@ -1,5 +1,8 @@
 export namespace Model {
   export const StepsPerSecond = 30;
+  export const TargetSpeed = 10;
+  export const MaxSpeed = 15;
+  export const MaxAcceleration = 3;
 
   // in meter
   export const TileWidth = 30;
