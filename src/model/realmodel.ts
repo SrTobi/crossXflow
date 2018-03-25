@@ -73,24 +73,14 @@ class Node {
 class Reserved {
     constructor(
         public edge: Edge,
-        public startAlpha: number,
         public startStep: number,
-        public startSpeed: number,
-        public acceleration: number,
         public steps: number
     ) {
     }
 
-    get duration(): number {
-        return this.steps / Model.StepsPerSecond
-    }
-
-    get endSpeed(): number {
-        return this.startSpeed + this.acceleration * this.duration
-    }
 
     get endStep(): number {
-        return this.startStep + this.startSpeed * this.duration + 0.5 * this.acceleration * this.duration ** 2
+        return this.startStep + this.steps
     }
 }
 
@@ -107,7 +97,8 @@ class Edge {
     constructor(
         public from: Node,
         public to: Node,
-        public length: number
+        public length: number,
+        public resevreNexts = 0
     ) {
     }
 
@@ -161,8 +152,8 @@ function makeAntiCollision(e1: Edge, e2: Edge) {
     e2.antiCollision.push(e1)
 }
 
-function connect(from: Node, to: Node, length: number): Edge {
-    const e = new Edge(from, to, length)
+function connect(from: Node, to: Node, length: number, reserveNexts?: number): Edge {
+    const e = new Edge(from, to, length, reserveNexts)
     from.outs.push(e)
     to.ins.push(e)
     return e
@@ -226,9 +217,9 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
         const bottomMin = new Node(new Vector(Model.TrackMin, 0))
         const bottomMax = new Node(new Vector(Model.TrackMax, 0))
 
-        const vnw = connect(topMin, vMidMin, Model.TileHeight / 2)
+        const vnw = connect(topMin, vMidMin, Model.TileHeight / 2, 2)
         const vsw = connect(vMidMin, bottomMin, Model.TileHeight / 2)
-        const vse = connect(bottomMax, vMidMax, Model.TileHeight / 2)
+        const vse = connect(bottomMax, vMidMax, Model.TileHeight / 2, 2)
         const vne = connect(vMidMax, topMax, Model.TileHeight / 2)
 
         const rightMin = new Node(new Vector(Model.TileWidth, Model.TrackMin))
@@ -238,9 +229,9 @@ function setupTileNodes(tmpl: Model.ITile, pos: Vector): Tile {
         const leftMin = new Node(new Vector(0, Model.TrackMin))
         const leftMax = new Node(new Vector(0, Model.TrackMax))
 
-        const hne = connect(rightMax, hMidMax, Model.TileWidth / 2)
+        const hne = connect(rightMax, hMidMax, Model.TileWidth / 2, 2)
         const hnw = connect(hMidMax, leftMax, Model.TileWidth / 2)
-        const hsw = connect(leftMin, hMidMin, Model.TileWidth / 2)
+        const hsw = connect(leftMin, hMidMin, Model.TileWidth / 2, 2)
         const hse = connect(hMidMin, rightMin, Model.TileWidth / 2)
 
         makeAntiCollision(vnw, hnw)
@@ -375,9 +366,9 @@ export class BackendWorld implements Model.IWorld {
                     canCreate = true
                 }
             }
-            if (canCreate && Math.random() < 0.01) {
+            if (canCreate && Math.random() < 0.07) {
                 // new car
-                const c = new Car(e, 0, 10, 0)
+                const c = new Car(e, 0, 0, 0)
                 e.cars.push(c)
                 this.autos.push(c)
             }
@@ -433,73 +424,26 @@ export class BackendWorld implements Model.IWorld {
                     processEdge(next)
                 }
 
-                const processNextObstacles = (car: Car, turnNum: number,
-                                                minStep: number, maxStep: number,
-                                                minSpeed: number, maxSpeed: number,
-                                                carAlpha: number,
-                                                edge: Edge, metersTillHere: number): { speed: number, step: number } | void => {
-
-                    const genGap = (minStep: number, maxStep: number, minSpeed: number, maxSpeed: number):
-                        {
-                            minStep: number,
-                            maxStep: number,
-                            minSpeed: number,
-                            maxSpeed: number,
-                        } | void => {
-                        for (const antiEdges of edge.antiCollision) {
-                            for (const obstacle of edge.reserved) {
-                                
-                            }
-                        }
-                    }
-
-                    if (edge.reserved.length === 0) {
-                        const metersTillEnd = (1 - carAlpha) * edge.length
-
-                        const nexts = edge.to.outs
-                        if (nexts.length === 0) {
-                            // drive out of map
-                            return {
-                                speed: maxSpeed,
-                                step: minStep
-                            }
-                        } else {
-                            const result = processNextObstacles(
-                                car,
-                                turnNum + 1,
-                                minStep /*...*/,
-                                maxStep /*...*/,
-                                minSpeed /* ... */,
-                                maxSpeed /*...*/,
-                                0,
-                                nexts[car.roadToTake(turnNum, nexts.length)],
-                                metersTillHere + metersTillEnd)
-                            
-                            if (result) {
-                                const {speed: targetSpeed, step: targetStep} = result
-
-                                return {
-                                    speed: 0,
-                                    step: 0
-                                }
-                            }
-                        }
-
-                    } else {
-                        const obstacle = edge.reserved[edge.reserved.length - 1]
-                        const targetSpeed = obstacle.endSpeed
-                        const targetStep = 0 /*  <  */
-
-                        const canDoIt = false
-
-
-                    }
-                }
-
                 // process all cars that are on this edge
-                for (const car of edge.cars) {
-                    processNextObstacles(0, 0, car.alpha, edge, 0)
-                }
+                edge.cars.forEach((car, i) => {
+                    const nextEdge = edge.to.outs[car.roadToTake(0, edge.to.outs.length)]
+                    const sameEdge = i > 0
+                    car.acceleration = Model.MaxAcceleration / 2
+                    if (sameEdge || nextEdge) {
+                        const nextCar: Car | undefined = sameEdge ? edge.cars[i - 1] : nextEdge.cars[nextEdge.cars.length - 1]
+
+                        if (nextCar) {
+                            const alphaDiff = sameEdge? car.alpha - nextCar.alpha : car.alpha - 1 - (nextEdge.length / edge.length) * nextCar.alpha
+                            car.acceleration = (1/Model.StepsPerSecond) * (-700 * (alphaDiff) - 100 * (car.speed - nextCar.speed))
+                        }
+                    }
+
+                    if (car.speed + car.acceleration / Model.StepsPerSecond > Model.MaxSpeed) {
+                        car.acceleration = 0
+                        car.speed = Model.MaxSpeed
+                    }
+                    
+                })
             }
         }
 
