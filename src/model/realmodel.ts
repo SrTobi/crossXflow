@@ -588,8 +588,8 @@ export class BackendWorld implements Model.IWorld {
                         
                         if (nextCar) {
                             const alphaDiff = sameEdge
-                                ? car.alpha - nextCar.alpha
-                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha;
+                                ? car.alpha - nextCar.alpha + (Model.CarLength/2 + 0.3) / edge.length
+                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha + (Model.CarLength/2 + 0.3) / edge.length;
                             car.acceleration = 1 / Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed - nextCar.speed));
                         }
                     }
