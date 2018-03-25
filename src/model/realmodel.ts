@@ -510,7 +510,7 @@ export class BackendWorld implements Model.IWorld {
                     canCreate = true;
                 }
             }
-            if (canCreate && Math.random() < 0.01) {
+            if (canCreate && Math.random() < 0.02) {
                 // new car
                 const c = new Car(e, 0, 0, 0);
                 e.cars.push(c);
@@ -588,8 +588,8 @@ export class BackendWorld implements Model.IWorld {
                         
                         if (nextCar) {
                             const alphaDiff = sameEdge
-                                ? car.alpha - nextCar.alpha + (Model.CarLength/2 + 0.3) / edge.length
-                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha + (Model.CarLength/2 + 0.3) / edge.length;
+                                ? car.alpha - nextCar.alpha + (Model.CarLength + 1) / edge.length
+                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha + (Model.CarLength + 1) / edge.length;
                             car.acceleration = 1 / Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed - nextCar.speed));
                         }
                     }
@@ -607,6 +607,10 @@ export class BackendWorld implements Model.IWorld {
                         const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car)
                         if (canLock) {
                             nextEdge.locks.forEach((value) => value.holder = car)
+                        }
+
+                        if (nextEdge.locks.find(lock => lock.holder != car && lock.holder != null)) {
+                            car.acceleration = -Model.MaxAcceleration
                         }
                     }
                 });
