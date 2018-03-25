@@ -14,6 +14,25 @@ export class Cars extends Entity {
 
   update(dt: number): void {}
 
+  updateCars(cars: Model.ICar[]) {
+    const newCarIds: Set<number> = new Set();
+    for (const car of cars) {
+      newCarIds.add(car.id);
+      const graphic = this.graphics.get(car.id);
+      if (graphic === undefined) {
+        this.addCar(car);
+      } else {
+        this.updateCarSprite(graphic, car);
+      }
+    }
+    // Garbage collect vanished cars
+    for (const carId of this.graphics.keys()) {
+      if (!newCarIds.has(carId)) {
+        this.removeCar(carId);
+      }
+    }
+  }
+
   private generateCarSprite() {
     const sprite = new PIXI.Sprite(this.res.tiles.car["red"]);
     sprite.scale.x = 1 / sprite.width;
@@ -26,12 +45,20 @@ export class Cars extends Entity {
     // center the sprite's anchor point
     carSprite.anchor.set(0.5);
 
+    this.addChild(carSprite);
+    this.graphics.set(car.id, carSprite);
+    this.updateCarSprite(carSprite, car);
+  }
+  private updateCarSprite(carSprite: PIXI.Sprite, car: Model.ICar) {
     // move the sprite to the center of the screen
     carSprite.x = car.pos.x;
     carSprite.y = car.pos.y;
     carSprite.rotation = car.angle;
-
-    this.addChild(carSprite);
-    this.graphics.set(car.id, carSprite);
+  }
+  private removeCar(carId: number) {
+    const sprite = this.graphics.get(carId);
+    if (sprite === undefined) return;
+    this.removeChild(sprite);
+    this.graphics.delete(carId);
   }
 }

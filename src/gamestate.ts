@@ -7,6 +7,8 @@ import { Creature } from "./creature";
 import { Key, Keys } from "./keyboard";
 import { DummyModel } from "./model/dummymodel";
 import { Tile } from "./tiledef";
+import { Model } from "./modeldef";
+import { Cars } from "./cars";
 
 const ScreenDimensionX = 100;
 const ScreenDimensionY = 100;
@@ -53,10 +55,13 @@ export class GameState extends State {
   private screenHeight: number;
   private player: Creature;
   private ctrl = new Controls();
+  private cars: Cars;
+
+  private gameTime = 0;
 
   constructor(private resources: Resources) {
     super();
-
+    this.cars = new Cars(resources);
     this.worldGenerator = new WorldGenerator(resources);
   }
 
@@ -67,8 +72,6 @@ export class GameState extends State {
     this.stage.addChild(this.view);
 
     this.player = this.addEntity(new Creature());
-
-    console.log(this.model.receiveCars());
   }
 
   leave(next: State): void {
@@ -84,6 +87,15 @@ export class GameState extends State {
 
   update(dt: number): State | null {
     this.world.update(dt);
+
+    this.gameTime += dt;
+
+    const timePerStep = 1 / Model.StepsPerSecond;
+    while (this.gameTime >= timePerStep) {
+      this.gameTime -= timePerStep;
+      this.model.update();
+      this.cars.updateCars(this.model.cars);
+    }
 
     this.entities.forEach(entity => entity.update(dt));
 
