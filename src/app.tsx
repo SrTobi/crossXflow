@@ -14,6 +14,6 @@ export class App extends React.Component<{}, AppState> {
   };
 
   render() {
-    return <div className="container">{this.state.gameView}</div>;
+    return this.state.gameView;
   }
 }
