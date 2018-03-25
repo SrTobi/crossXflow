@@ -9,7 +9,7 @@ import { DummyModel } from "./model/dummymodel";
 import { Tile } from "./tiledef";
 import { Model } from "./modeldef";
 import { Cars } from "./cars";
-import { BackendWorld } from './model/realmodel'
+import { BackendWorld } from "./model/realmodel";
 
 const ScreenDimensionX = 100;
 const ScreenDimensionY = 100;
@@ -54,11 +54,13 @@ export class GameState extends State {
   private view = new PIXI.Container();
   private screenWidth: number;
   private screenHeight: number;
-  private player: Creature;
   private ctrl = new Controls();
   private cars: Cars;
 
   private gameTime = 0;
+
+  private screenx = 1.5;
+  private screeny = 1.5;
 
   constructor(private resources: Resources) {
     super();
@@ -70,10 +72,8 @@ export class GameState extends State {
     this.world = this.worldGenerator.buildWorld(this.model.tiles);
 
     this.view.addChild(this.world);
-    this.view.addChild(this.cars)
+    this.view.addChild(this.cars);
     this.stage.addChild(this.view);
-
-    this.player = this.addEntity(new Creature());
   }
 
   leave(next: State): void {
@@ -102,15 +102,15 @@ export class GameState extends State {
     this.entities.forEach(entity => entity.update(dt));
 
     // update player
-    this.player.x += this.ctrl.verticalMovement() * PlayerSpeed * dt;
-    this.player.y += this.ctrl.horizontalMovement() * PlayerSpeed * dt;
+    this.screenx += this.ctrl.verticalMovement() * PlayerSpeed * dt;
+    this.screeny += this.ctrl.horizontalMovement() * PlayerSpeed * dt;
 
     // update view
-    this.view.x = -this.player.x;
-    this.view.y = -this.player.y;
+    this.view.x = -this.screenx;
+    this.view.y = -this.screeny;
     this.world.setView(
-      this.player.x,
-      this.player.y,
+      this.screenx,
+      this.screeny,
       ScreenDimensionX,
       ScreenDimensionY
     );
