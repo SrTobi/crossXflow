@@ -68,6 +68,8 @@ class Car {
             this.randomList.push(Math.random());
         }
     }
+
+    public heldLocks = 0;
 }
 
 class Node {
@@ -397,9 +399,10 @@ function cross(): Model.ITile {
 
 export class BackendWorld implements Model.IWorld {
     tiles: Model.ITile[][] = [
-        [empty(), vertical(), empty()],
-        [horizontal(), cross(), horizontal()],
-        [empty(), vertical(), empty()]
+        [empty(), vertical(), vertical(), empty()],
+        [horizontal(), cross(), cross(), horizontal()],
+        [horizontal(), cross(), cross(), horizontal()],
+        [empty(), vertical(), vertical(), empty()]
     ];
     
     private genNodes: Node[] = [];
@@ -525,7 +528,7 @@ export class BackendWorld implements Model.IWorld {
         let kill = false;
         for (const car of this.autos) {
             car.speed += car.acceleration / Model.StepsPerSecond;
-            car.speed = Math.max(car.speed, 0)
+            car.speed = Math.max(car.speed, 2)
             let meters = car.speed / Model.StepsPerSecond;
             while (meters > 0) {
                 const alphaDiff = meters / car.edge.length;
@@ -543,7 +546,12 @@ export class BackendWorld implements Model.IWorld {
                     
                     if ((outs.length == 0 || outs[car.roadToTake(0, outs.length)].locks.every(lock => lock.holder != car))
                         && car.edge.locks.find(lock => lock.holder == car)) {
-                        car.edge.locks.filter(lock => lock.holder == car).forEach(lock => lock.holder = null)
+                        car.edge.locks.filter(lock => lock.holder == car).forEach(
+                            lock => {
+                                lock.holder = null
+                                --car.heldLocks
+                            }
+                        )
                     }
 
                     if (outs.length == 0) {
@@ -583,13 +591,21 @@ export class BackendWorld implements Model.IWorld {
                     car.acceleration = Model.MaxAcceleration / 2;
                     if (sameEdge || nextEdge) {
                         const nextCar: Car | undefined = sameEdge
-                        ? edge.cars[i - 1]
-                        : nextEdge.cars[nextEdge.cars.length - 1];
-                        
-                        if (nextCar) {
+                            ? edge.cars[i - 1]
+                            : nextEdge.cars[nextEdge.cars.length - 1];
+
+
+
+                        const driveToTileEnd = !sameEdge && nextEdge && nextEdge.locks.find(lock => lock.holder != car && lock.holder != null)
+                        if (driveToTileEnd) {
+                            const alphaDiff = car.alpha - 0.8 - nextEdge.length / edge.length + (Model.CarLength + 1) / edge.length;
+                            car.acceleration = 1 / Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed));
+                        }
+                        if (nextCar && nextCar.acceleration > -Model.MaxAcceleration + 2) {
+                            const driveTo = (driveToTileEnd? 1 : nextCar.alpha)
                             const alphaDiff = sameEdge
-                                ? car.alpha - nextCar.alpha + (Model.CarLength + 1) / edge.length
-                                : car.alpha - 1 - nextEdge.length / edge.length * nextCar.alpha + (Model.CarLength + 1) / edge.length;
+                                ? car.alpha - driveTo + (Model.CarLength + 1) / edge.length
+                                : car.alpha - 1 - nextEdge.length / edge.length * driveTo + (Model.CarLength + 1) / edge.length;
                             car.acceleration = 1 / Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed - nextCar.speed));
                         }
                     }
@@ -603,14 +619,23 @@ export class BackendWorld implements Model.IWorld {
                         car.acceleration = -Model.MaxAcceleration
                     }
 
+                    const canLock = edge.locks.every((value) => value.holder == null || value.holder == car)
+                    if (canLock) {
+                        edge.locks.forEach((value) => {
+                            if (value.holder == null)
+                                car.heldLocks++
+                            value.holder = car
+                        })
+                    }
+
                     if (nextEdge) {
                         const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car)
                         if (canLock) {
-                            nextEdge.locks.forEach((value) => value.holder = car)
-                        }
-
-                        if (nextEdge.locks.find(lock => lock.holder != car && lock.holder != null)) {
-                            car.acceleration = -Model.MaxAcceleration
+                            nextEdge.locks.forEach((value) => {
+                                if (value.holder == null)
+                                    car.heldLocks++
+                                value.holder = car
+                            })
                         }
                     }
                 });
@@ -636,7 +661,8 @@ export class BackendWorld implements Model.IWorld {
             return {
                 pos: car.edge.getPosition(car.alpha),
                 angle: car.edge.getAngle(car.alpha),
-                id: car.id
+                id: car.id,
+                hasLock: car.heldLocks > 0
             };
         });
     }

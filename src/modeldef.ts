@@ -25,6 +25,7 @@ export namespace Model {
     // (0-360), 0 is up and it goes clockwise
     angle: number;
     id: number;
+    hasLock: boolean
   }
 
   export enum TileType {
