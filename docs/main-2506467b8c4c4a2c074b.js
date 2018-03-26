@@ -1,18 +1,18 @@
 webpackJsonp([1],{
 
-/***/ 109:
+/***/ 108:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(13);
-const ReactDOM = __webpack_require__(113);
-const app_1 = __webpack_require__(122);
+const ReactDOM = __webpack_require__(112);
+const app_1 = __webpack_require__(121);
 __webpack_require__(105);
+__webpack_require__(230);
 __webpack_require__(231);
-__webpack_require__(232);
-__webpack_require__(240);
+__webpack_require__(235);
 const app = React.createElement(app_1.App, null);
 var target = document.createElement("div");
 ReactDOM.render(app, target);
@@ -21,7 +21,7 @@ document.body.appendChild(target);
 
 /***/ }),
 
-/***/ 122:
+/***/ 121:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -29,7 +29,7 @@ document.body.appendChild(target);
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __webpack_require__(13);
 const gameview_1 = __webpack_require__(29);
-const resources_1 = __webpack_require__(222);
+const resources_1 = __webpack_require__(221);
 class App extends React.Component {
     constructor() {
         super(...arguments);
@@ -86,14 +86,14 @@ var Model;
 
 /***/ }),
 
-/***/ 222:
+/***/ 221:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const loadstate_1 = __webpack_require__(223);
-const gamestate_1 = __webpack_require__(224);
+const loadstate_1 = __webpack_require__(222);
+const gamestate_1 = __webpack_require__(223);
 class ResourceLoaderState extends loadstate_1.LoadState {
     constructor() {
         super();
@@ -126,7 +126,7 @@ exports.ResourceLoaderState = ResourceLoaderState;
 
 /***/ }),
 
-/***/ 223:
+/***/ 222:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -168,7 +168,7 @@ exports.LoadState = LoadState;
 
 /***/ }),
 
-/***/ 224:
+/***/ 223:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -176,11 +176,11 @@ exports.LoadState = LoadState;
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
 const gameview_1 = __webpack_require__(29);
-const world_1 = __webpack_require__(225);
-const keyboard_1 = __webpack_require__(227);
+const world_1 = __webpack_require__(224);
+const keyboard_1 = __webpack_require__(226);
 const modeldef_1 = __webpack_require__(21);
-const cars_1 = __webpack_require__(228);
-const realmodel_1 = __webpack_require__(230);
+const cars_1 = __webpack_require__(227);
+const realmodel_1 = __webpack_require__(229);
 const ScreenDimensionX = 100;
 const ScreenDimensionY = 100;
 const PlayerSpeed = 1;
@@ -279,14 +279,14 @@ exports.GameState = GameState;
 
 /***/ }),
 
-/***/ 225:
+/***/ 224:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const tiledef_1 = __webpack_require__(226);
+const tiledef_1 = __webpack_require__(225);
 const modeldef_1 = __webpack_require__(21);
 class World extends PIXI.Container {
     constructor(width, height, tiles) {
@@ -365,7 +365,7 @@ exports.WorldGenerator = WorldGenerator;
 
 /***/ }),
 
-/***/ 226:
+/***/ 225:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -445,7 +445,7 @@ exports.StreetTile = StreetTile;
 
 /***/ }),
 
-/***/ 227:
+/***/ 226:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -544,14 +544,14 @@ var Keys;
 
 /***/ }),
 
-/***/ 228:
+/***/ 227:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const entity_1 = __webpack_require__(229);
+const entity_1 = __webpack_require__(228);
 const modeldef_1 = __webpack_require__(21);
 class Cars extends entity_1.Entity {
     constructor(res) {
@@ -614,7 +614,7 @@ exports.Cars = Cars;
 
 /***/ }),
 
-/***/ 229:
+/***/ 228:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -628,7 +628,7 @@ exports.Entity = Entity;
 
 /***/ }),
 
-/***/ 230:
+/***/ 229:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1167,11 +1167,11 @@ exports.BackendWorld = BackendWorld;
 
 /***/ }),
 
-/***/ 240:
+/***/ 235:
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(241);
+var content = __webpack_require__(236);
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -1185,7 +1185,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(108)(content, options);
+var update = __webpack_require__(107)(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -1218,7 +1218,7 @@ if(false) {
 
 /***/ }),
 
-/***/ 241:
+/***/ 236:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(106)(false);
@@ -1321,5 +1321,5 @@ exports.GameView = GameView;
 
 /***/ })
 
-},[109]);
-//# sourceMappingURL=main-c6168d4c1da1a538b175.js.map
+},[108]);
+//# sourceMappingURL=main-2506467b8c4c4a2c074b.js.map
