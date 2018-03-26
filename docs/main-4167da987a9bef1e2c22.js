@@ -926,10 +926,11 @@ function cross() {
 class BackendWorld {
     constructor() {
         this.tiles = [
-            [empty(), vertical(), vertical(), empty()],
-            [horizontal(), cross(), cross(), horizontal()],
-            [horizontal(), cross(), cross(), horizontal()],
-            [empty(), vertical(), vertical(), empty()]
+            [empty(), vertical(), vertical(), vertical(), empty()],
+            [horizontal(), cross(), cross(), cross(), horizontal()],
+            [horizontal(), cross(), cross(), cross(), horizontal()],
+            [horizontal(), cross(), cross(), cross(), horizontal()],
+            [empty(), vertical(), vertical(), vertical(), empty()]
         ];
         this.genNodes = [];
         this.pieces = [];
@@ -1026,7 +1027,7 @@ class BackendWorld {
                     canCreate = true;
                 }
             }
-            if (canCreate && Math.random() < 0.02) {
+            if (canCreate && this.autos.length < 40 && Math.random() < 0.21) {
                 // new car
                 const c = new Car(e, 0, 0, 0);
                 e.cars.push(c);
@@ -1040,7 +1041,7 @@ class BackendWorld {
         let kill = false;
         for (const car of this.autos) {
             car.speed += car.acceleration / modeldef_1.Model.StepsPerSecond;
-            car.speed = Math.max(car.speed, 2);
+            car.speed = Math.max(car.speed, 0);
             let meters = car.speed / modeldef_1.Model.StepsPerSecond;
             while (meters > 0) {
                 const alphaDiff = meters / car.edge.length;
@@ -1094,16 +1095,37 @@ class BackendWorld {
                     const nextEdge = edge.to.outs[car.roadToTake(0, edge.to.outs.length)];
                     const sameEdge = i > 0;
                     car.acceleration = modeldef_1.Model.MaxAcceleration / 2;
+                    const canLock = edge.locks.every((value) => value.holder == null || value.holder == car);
+                    if (canLock && i == 0) {
+                        edge.locks.forEach((value) => {
+                            if (value.holder == null)
+                                car.heldLocks++;
+                            value.holder = car;
+                        });
+                    }
+                    if (nextEdge) {
+                        const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car);
+                        if (canLock && i == 0) {
+                            nextEdge.locks.forEach((value) => {
+                                if (value.holder == null)
+                                    car.heldLocks++;
+                                value.holder = car;
+                            });
+                        }
+                        if (nextEdge.locks.find(lock => lock.holder != car && lock.holder != null)) {
+                            car.acceleration = -modeldef_1.Model.MaxAcceleration * 2;
+                        }
+                    }
                     if (sameEdge || nextEdge) {
                         const nextCar = sameEdge
                             ? edge.cars[i - 1]
                             : nextEdge.cars[nextEdge.cars.length - 1];
-                        const driveToTileEnd = !sameEdge && nextEdge && nextEdge.locks.find(lock => lock.holder != car && lock.holder != null);
+                        const driveToTileEnd = i == 0 && nextEdge && nextEdge.cars.length == 0 && nextEdge.locks.find(lock => lock.holder != car && lock.holder != null);
                         if (driveToTileEnd) {
                             const alphaDiff = car.alpha - 0.8 - nextEdge.length / edge.length + (modeldef_1.Model.CarLength + 1) / edge.length;
                             car.acceleration = 1 / modeldef_1.Model.StepsPerSecond * (-700 * alphaDiff - 100 * (car.speed));
                         }
-                        if (nextCar && nextCar.acceleration > -modeldef_1.Model.MaxAcceleration + 2) {
+                        if (nextCar && nextCar.acceleration > -modeldef_1.Model.MaxAcceleration * 2 + 1) {
                             const driveTo = (driveToTileEnd ? 1 : nextCar.alpha);
                             const alphaDiff = sameEdge
                                 ? car.alpha - driveTo + (modeldef_1.Model.CarLength + 1) / edge.length
@@ -1116,25 +1138,7 @@ class BackendWorld {
                         car.speed = modeldef_1.Model.MaxSpeed;
                     }
                     if (edge.locks.find(lock => lock.holder != car && lock.holder != null)) {
-                        car.acceleration = -modeldef_1.Model.MaxAcceleration;
-                    }
-                    const canLock = edge.locks.every((value) => value.holder == null || value.holder == car);
-                    if (canLock) {
-                        edge.locks.forEach((value) => {
-                            if (value.holder == null)
-                                car.heldLocks++;
-                            value.holder = car;
-                        });
-                    }
-                    if (nextEdge) {
-                        const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car);
-                        if (canLock) {
-                            nextEdge.locks.forEach((value) => {
-                                if (value.holder == null)
-                                    car.heldLocks++;
-                                value.holder = car;
-                            });
-                        }
+                        car.acceleration = -modeldef_1.Model.MaxAcceleration * 2;
                     }
                 });
             }
@@ -1322,4 +1326,4 @@ exports.GameView = GameView;
 /***/ })
 
 },[109]);
-//# sourceMappingURL=main-c6168d4c1da1a538b175.js.map
+//# sourceMappingURL=main-4167da987a9bef1e2c22.js.map
