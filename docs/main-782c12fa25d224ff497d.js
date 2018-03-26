@@ -602,7 +602,7 @@ class Cars extends entity_1.Entity {
         carSprite.x = car.pos.x / modeldef_1.Model.TileWidth;
         carSprite.y = car.pos.y / modeldef_1.Model.TileHeight;
         carSprite.rotation = Math.PI + car.angle;
-        carSprite.alpha = car.hasLock ? 1.0 : 0.5;
+        carSprite.alpha = car.hasLock ? 1.0 : 0.75;
     }
     removeCar(carId) {
         const sprite = this.graphics.get(carId);
@@ -1329,4 +1329,4 @@ exports.GameView = GameView;
 /***/ })
 
 },[109]);
-//# sourceMappingURL=main-ddaf40129eee6bc1bef3.js.map
+//# sourceMappingURL=main-782c12fa25d224ff497d.js.map
