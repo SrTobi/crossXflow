@@ -26,8 +26,10 @@ var config = {
   module: {
     loaders: [
       { test: /\.css$/, loader: "style-loader!css-loader" },
-      { test: /\.(jpe?g|png|gif|woff|woff2|eot|ttf|svg)$/i, loader: "file-loader" },
-      { test: /\.tsx?$/, loader: 'ts-loader' }
+      { test: /\.(woff|woff2|eot|ttf|svg)$/i, loader: "file-loader" },
+      { test: /\.tsx?$/, loader: 'ts-loader' },
+      { test: /\.json$/, loader: 'file' },
+      { test: /\.(jpe?g|png|gif)$/i, loaders: ['file?name=[path][name].[ext]'] }
     ] 
   },
   plugins: [
