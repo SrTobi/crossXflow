@@ -120,6 +120,7 @@ class ResourceLoaderState extends loadstate_1.LoadState {
             }
         };
         const music = res.music.data;
+        music.loop = true;
         music.play({ loop: true });
         return new gamestate_1.GameState(resources);
     }
@@ -1329,4 +1330,4 @@ exports.GameView = GameView;
 /***/ })
 
 },[109]);
-//# sourceMappingURL=main-782c12fa25d224ff497d.js.map
+//# sourceMappingURL=main-e087927dcc58d2720aa3.js.map
