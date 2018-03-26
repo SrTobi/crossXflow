@@ -5,6 +5,7 @@ npm install
 npm run bundle
 mkdir docs
 cp -r dist/* docs
+cp -r assets docs
 git add docs
 git commit -m "publish new version"
 git push -f
