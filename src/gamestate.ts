@@ -69,11 +69,6 @@ export class GameState extends State {
   }
 
   enter(prev: State, renderer: PIXI.SystemRenderer): void {
-    Sound.Sound.from({
-      autoPlay: true,
-      url: "assets/waltz_short.mp3",
-      loop: true
-    })
     this.world = this.worldGenerator.buildWorld(this.model.tiles);
 
     this.view.addChild(this.world);

@@ -20,6 +20,7 @@ export class ResourceLoaderState extends LoadState {
 
   load(loader: PIXI.loaders.Loader): void {
     loader.add("atlas", "assets/tiles.json");
+    loader.add("music", "assets/waltz_short.mp3")
   }
 
   loaded(loader: PIXI.loaders.Loader, res: any): State {
@@ -40,6 +41,11 @@ export class ResourceLoaderState extends LoadState {
         car: [1, 2, 3].map(idx => tex(`car-${idx}.png`))
       }
     };
+
+    const music = res.music.data as PIXI.sound.Sound
+    music.loop = true
+    music.play({ loop: true })
+
     return new GameState(resources);
   }
 }

@@ -55,7 +55,7 @@ export class Cars extends Entity {
     carSprite.x = car.pos.x / Model.TileWidth;
     carSprite.y = car.pos.y / Model.TileHeight;
     carSprite.rotation = Math.PI + car.angle;
-    carSprite.alpha = car.hasLock? 1.0 : 0.5
+    carSprite.alpha = car.hasLock? 1.0 : 0.75
   }
   private removeCar(carId: number) {
     const sprite = this.graphics.get(carId);

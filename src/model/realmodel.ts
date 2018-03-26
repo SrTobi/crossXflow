@@ -35,6 +35,8 @@ class Vector {
 
 var nextId = 1;
 
+const RandomListSize = 30
+
 class Car {
     private randomList: number[] = [];
     private curRand: number = 0;
@@ -43,12 +45,12 @@ class Car {
     public alive: boolean = true;
     
     private get random(): number {
-        return this.randomList[this.curRand % 10];
+        return this.randomList[this.curRand % RandomListSize];
     }
     
     public roadToTake(futureIdx: number, possibleRoads: number): number {
         return Math.floor(
-            this.randomList[(this.curRand + futureIdx) % 10] * possibleRoads
+            this.randomList[(this.curRand + futureIdx) % RandomListSize] * possibleRoads
         );
     }
     
@@ -64,7 +66,7 @@ class Car {
         public speed: number = 0,
         public acceleration: number = 0
     ) {
-        for (let i = 0; i < 10; ++i) {
+        for (let i = 0; i < RandomListSize; ++i) {
             this.randomList.push(Math.random());
         }
     }
