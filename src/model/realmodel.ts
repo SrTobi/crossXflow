@@ -514,7 +514,7 @@ export class BackendWorld implements Model.IWorld {
                     canCreate = true;
                 }
             }
-            if (canCreate && this.autos.length < 40 && Math.random() < 0.21) {
+            if (canCreate && this.autos.length < 40 && Math.random() < 0.18) {
                 // new car
                 const c = new Car(e, 0, 0, 0);
                 e.cars.push(c);

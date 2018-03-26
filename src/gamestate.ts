@@ -10,8 +10,8 @@ import { Model } from "./modeldef";
 import { Cars } from "./cars";
 import { BackendWorld } from "./model/realmodel";
 
-const ScreenDimensionX = 100;
-const ScreenDimensionY = 100;
+const ScreenDimensionX = 75;
+const ScreenDimensionY = 75;
 const PlayerSpeed = 1;
 
 class Controls {
@@ -58,8 +58,8 @@ export class GameState extends State {
 
   private gameTime = 0;
 
-  private screenx = 1.5;
-  private screeny = 1.5;
+  private screenx = 2.5;
+  private screeny = 2.5;
 
   constructor(private resources: Resources) {
     super();
