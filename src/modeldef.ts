@@ -1,7 +1,7 @@
 export namespace Model {
   export const StepsPerSecond = 30;
   export const TargetSpeed = 10;
-  export const MaxSpeed = 30;
+  export const MaxSpeed = 20;
   export const MaxAcceleration = 100;
 
   // in meter

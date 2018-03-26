@@ -23,6 +23,7 @@
     "jquery": "^3.3.1",
     "phaser": "^3.3.0",
     "pixi.js": "^4.7.1",
+    "pixi-sound": "^2.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "webpack-cli": "^2.0.13"
