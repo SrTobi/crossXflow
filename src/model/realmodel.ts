@@ -513,7 +513,7 @@ export class BackendWorld implements Model.IWorld {
                     canCreate = true;
                 }
             }
-            if (canCreate && Math.random() < 0.02) {
+            if (canCreate && Math.random() < 0.21) {
                 // new car
                 const c = new Car(e, 0, 0, 0);
                 e.cars.push(c);
@@ -528,7 +528,7 @@ export class BackendWorld implements Model.IWorld {
         let kill = false;
         for (const car of this.autos) {
             car.speed += car.acceleration / Model.StepsPerSecond;
-            car.speed = Math.max(car.speed, 2)
+            car.speed = Math.max(car.speed, 0)
             let meters = car.speed / Model.StepsPerSecond;
             while (meters > 0) {
                 const alphaDiff = meters / car.edge.length;
@@ -616,11 +616,11 @@ export class BackendWorld implements Model.IWorld {
                     }
 
                     if (edge.locks.find(lock => lock.holder != car && lock.holder != null)) {
-                        car.acceleration = -Model.MaxAcceleration
+                        car.acceleration = -Model.MaxAcceleration * 2
                     }
 
                     const canLock = edge.locks.every((value) => value.holder == null || value.holder == car)
-                    if (canLock) {
+                    if (canLock && i == 0) {
                         edge.locks.forEach((value) => {
                             if (value.holder == null)
                                 car.heldLocks++
@@ -630,7 +630,7 @@ export class BackendWorld implements Model.IWorld {
 
                     if (nextEdge) {
                         const canLock = nextEdge.locks.every((value) => value.holder == null || value.holder == car)
-                        if (canLock) {
+                        if (canLock && i == 0) {
                             nextEdge.locks.forEach((value) => {
                                 if (value.holder == null)
                                     car.heldLocks++
