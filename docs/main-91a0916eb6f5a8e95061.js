@@ -667,6 +667,7 @@ class Vector {
     }
 }
 var nextId = 1;
+const RandomListSize = 30;
 class Car {
     constructor(edge, alpha = 0, speed = 0, acceleration = 0) {
         this.edge = edge;
@@ -678,15 +679,15 @@ class Car {
         this.id = nextId++;
         this.alive = true;
         this.heldLocks = 0;
-        for (let i = 0; i < 10; ++i) {
+        for (let i = 0; i < RandomListSize; ++i) {
             this.randomList.push(Math.random());
         }
     }
     get random() {
-        return this.randomList[this.curRand % 10];
+        return this.randomList[this.curRand % RandomListSize];
     }
     roadToTake(futureIdx, possibleRoads) {
-        return Math.floor(this.randomList[(this.curRand + futureIdx) % 10] * possibleRoads);
+        return Math.floor(this.randomList[(this.curRand + futureIdx) % RandomListSize] * possibleRoads);
     }
     gotoNextRoad(possibleRoads) {
         const road = this.roadToTake(0, possibleRoads);
@@ -1330,4 +1331,4 @@ exports.GameView = GameView;
 /***/ })
 
 },[109]);
-//# sourceMappingURL=main-e087927dcc58d2720aa3.js.map
+//# sourceMappingURL=main-91a0916eb6f5a8e95061.js.map
