@@ -6,13 +6,13 @@ webpackJsonp([1],{
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(14);
+const React = __webpack_require__(13);
 const ReactDOM = __webpack_require__(113);
 const app_1 = __webpack_require__(122);
 __webpack_require__(105);
-__webpack_require__(234);
-__webpack_require__(235);
-__webpack_require__(243);
+__webpack_require__(231);
+__webpack_require__(232);
+__webpack_require__(240);
 const app = React.createElement(app_1.App, null);
 var target = document.createElement("div");
 ReactDOM.render(app, target);
@@ -27,8 +27,8 @@ document.body.appendChild(target);
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(14);
-const gameview_1 = __webpack_require__(30);
+const React = __webpack_require__(13);
+const gameview_1 = __webpack_require__(29);
 const resources_1 = __webpack_require__(222);
 class App extends React.Component {
     constructor() {
@@ -46,7 +46,7 @@ exports.App = App;
 
 /***/ }),
 
-/***/ 22:
+/***/ 21:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -100,6 +100,7 @@ class ResourceLoaderState extends loadstate_1.LoadState {
     }
     load(loader) {
         loader.add("atlas", "assets/tiles.json");
+        loader.add("music", "assets/waltz_short.mp3");
     }
     loaded(loader, res) {
         let tiles = res.atlas.textures;
@@ -118,6 +119,8 @@ class ResourceLoaderState extends loadstate_1.LoadState {
                 car: [1, 2, 3].map(idx => tex(`car-${idx}.png`))
             }
         };
+        const music = res.music.data;
+        music.play({ loop: true });
         return new gamestate_1.GameState(resources);
     }
 }
@@ -132,7 +135,7 @@ exports.ResourceLoaderState = ResourceLoaderState;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const gameview_1 = __webpack_require__(30);
+const gameview_1 = __webpack_require__(29);
 const PIXI = __webpack_require__(9);
 class LoadState extends gameview_1.State {
     constructor() {
@@ -175,13 +178,12 @@ exports.LoadState = LoadState;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const Sound = __webpack_require__(225);
-const gameview_1 = __webpack_require__(30);
-const world_1 = __webpack_require__(228);
-const keyboard_1 = __webpack_require__(230);
-const modeldef_1 = __webpack_require__(22);
-const cars_1 = __webpack_require__(231);
-const realmodel_1 = __webpack_require__(233);
+const gameview_1 = __webpack_require__(29);
+const world_1 = __webpack_require__(225);
+const keyboard_1 = __webpack_require__(227);
+const modeldef_1 = __webpack_require__(21);
+const cars_1 = __webpack_require__(228);
+const realmodel_1 = __webpack_require__(230);
 const ScreenDimensionX = 75;
 const ScreenDimensionY = 75;
 const PlayerSpeed = 1;
@@ -229,11 +231,6 @@ class GameState extends gameview_1.State {
         this.worldGenerator = new world_1.WorldGenerator(resources);
     }
     enter(prev, renderer) {
-        Sound.Sound.from({
-            autoPlay: true,
-            url: "assets/waltz_short.mp3",
-            loop: true
-        });
         this.world = this.worldGenerator.buildWorld(this.model.tiles);
         this.view.addChild(this.world);
         this.view.addChild(this.cars);
@@ -285,15 +282,15 @@ exports.GameState = GameState;
 
 /***/ }),
 
-/***/ 228:
+/***/ 225:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const tiledef_1 = __webpack_require__(229);
-const modeldef_1 = __webpack_require__(22);
+const tiledef_1 = __webpack_require__(226);
+const modeldef_1 = __webpack_require__(21);
 class World extends PIXI.Container {
     constructor(width, height, tiles) {
         super();
@@ -371,14 +368,14 @@ exports.WorldGenerator = WorldGenerator;
 
 /***/ }),
 
-/***/ 229:
+/***/ 226:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const modeldef_1 = __webpack_require__(22);
+const modeldef_1 = __webpack_require__(21);
 class Tile extends PIXI.Container {
     update(dt) { }
 }
@@ -451,7 +448,7 @@ exports.StreetTile = StreetTile;
 
 /***/ }),
 
-/***/ 230:
+/***/ 227:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -550,15 +547,15 @@ var Keys;
 
 /***/ }),
 
-/***/ 231:
+/***/ 228:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const PIXI = __webpack_require__(9);
-const entity_1 = __webpack_require__(232);
-const modeldef_1 = __webpack_require__(22);
+const entity_1 = __webpack_require__(229);
+const modeldef_1 = __webpack_require__(21);
 class Cars extends entity_1.Entity {
     constructor(res) {
         super();
@@ -620,7 +617,7 @@ exports.Cars = Cars;
 
 /***/ }),
 
-/***/ 232:
+/***/ 229:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -634,13 +631,13 @@ exports.Entity = Entity;
 
 /***/ }),
 
-/***/ 233:
+/***/ 230:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const modeldef_1 = __webpack_require__(22);
+const modeldef_1 = __webpack_require__(21);
 class Vector {
     constructor(x, y) {
         this.x = x;
@@ -1177,11 +1174,11 @@ exports.BackendWorld = BackendWorld;
 
 /***/ }),
 
-/***/ 243:
+/***/ 240:
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(244);
+var content = __webpack_require__(241);
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -1228,7 +1225,7 @@ if(false) {
 
 /***/ }),
 
-/***/ 244:
+/***/ 241:
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(106)(false);
@@ -1243,13 +1240,13 @@ exports.push([module.i, "html,\nbody {\n  width: 100%;\n  height: 100%;\n\n  pad
 
 /***/ }),
 
-/***/ 30:
+/***/ 29:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __webpack_require__(14);
+const React = __webpack_require__(13);
 const PIXI = __webpack_require__(9);
 class State {
     enter(prev, renderer) { }
@@ -1332,4 +1329,4 @@ exports.GameView = GameView;
 /***/ })
 
 },[109]);
-//# sourceMappingURL=main-eae63ecbc3783caef7d0.js.map
+//# sourceMappingURL=main-ddaf40129eee6bc1bef3.js.map
